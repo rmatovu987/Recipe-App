@@ -1,0 +1,9 @@
+<app-header (selected)="navigate($event)"></app-header>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <app-recipes *ngIf="load === 'recipe'"></app-recipes>
+            <app-shooping-list *ngIf="load === 'list'"></app-shooping-list>
+        </div>
+    </div>
+</div>

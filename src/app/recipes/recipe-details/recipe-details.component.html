@@ -9,6 +9,9 @@
   </div>
 </div>
 <div class="row">
+  <div class="col-12">{{recipe.desc}}</div>
+</div>
+<div class="row mt-3">
   <div class="col-12">
     <div class="btn-group" role="group">
       <button
@@ -21,16 +24,19 @@
         Manage Recipe
       </button>
       <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-        <li><a class="dropdown-item" href="#">Add to shopping list</a></li>
+        <li><a class="dropdown-item" href="#" (click)='addToShoppingList()'>Add to shopping list</a></li>
         <li><a class="dropdown-item" href="#">Edit recipe</a></li>
         <li><a class="dropdown-item" href="#">Delete recipe</a></li>
       </ul>
     </div>
   </div>
 </div>
-<div class="row">
-  <div class="col-12">Description</div>
-</div>
-<div class="row">
-  <div class="col-12">Ingredients</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <h4>Ingredients</h4>
+    <ul class="list-group">
+      <li class="list-group-item" *ngFor='let ing of recipe.ingredients'>{{ing.name}} ({{ing.amount}})</li>
+    </ul>
+  </div>
 </div>

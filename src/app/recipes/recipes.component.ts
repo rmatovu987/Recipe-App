@@ -1,3 +1,4 @@
+import { RecipeService } from './../shared/recipe.service';
 import { Recipe } from './recipe.model';
 import { Component, Input, OnInit } from '@angular/core';
 
@@ -9,13 +10,12 @@ import { Component, Input, OnInit } from '@angular/core';
 export class RecipesComponent implements OnInit {
   selected: Recipe;
 
-  constructor() { }
+  constructor(private rec: RecipeService) { }
 
   ngOnInit(): void {
-  }
-
-  select(recipe: Recipe) {
-    this.selected = recipe;
+    this.rec.recipeSelected.subscribe((recipe: Recipe) => {
+      this.selected = recipe;
+    });
   }
 
 }

@@ -3,8 +3,14 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="row">
         <div class="col-12">
-          <button type="submit" class="btn btn-success mx-1" [disabled]="form.invalid">Save</button>
-          <button type="button" class="btn btn-danger mx-1">Cancel</button>
+          <button
+            type="submit"
+            class="btn btn-success mx-1"
+            [disabled]="form.invalid"
+          >
+            {{editMode ? 'Update' : 'Save'}}
+          </button>
+          <button type="button" class="btn btn-danger mx-1" (click)="onCancel()">Cancel</button>
         </div>
       </div>
 
@@ -33,12 +39,13 @@
               id="imgPath"
               class="form-control"
               formControlName="imagePath"
+              #imagePath
             />
           </div>
         </div>
       </div>
       <div class="row">
-        <img src="" alt="" class="img-fluid" />
+        <img [src]="imagePath.value" alt="" class="img-fluid" />
       </div>
 
       <div class="row">
@@ -93,7 +100,7 @@
               />
             </div>
             <div class="col-2">
-              <div class="btn btn-danger">X</div>
+              <button type="button" (click)="onDeleteIng(i)" class="btn btn-danger">X</button>
             </div>
           </div>
         </div>

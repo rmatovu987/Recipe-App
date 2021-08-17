@@ -1,15 +1,20 @@
+import { AuthService } from "./auth.service";
 import { RecipeService } from "./recipes/recipe.service";
 import { Recipe } from "./recipes/recipe.model";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { map, tap } from "rxjs/operators";
+import { exhaustMap, map, take, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
 
 @Injectable({
   providedIn: "root",
 })
 export class DataStorageService {
-  constructor(private http: HttpClient, private rServ: RecipeService) {}
+  constructor(
+    private http: HttpClient,
+    private rServ: RecipeService,
+    private authS: AuthService
+  ) {}
 
   saveRecipes() {
     const recipes = this.rServ.getRecipes();
@@ -29,16 +34,16 @@ export class DataStorageService {
         "https://anguka-53223-default-rtdb.firebaseio.com/recipes.json"
       )
       .pipe(
-        map(recipes => {
+        map((recipes) => {
           console.log(recipes);
-          return recipes.map(recipe => {
+          return recipes.map((recipe) => {
             return {
               ...recipe,
               ingredients: recipe.ingredients ? recipe.ingredients : [],
             };
           });
         }),
-        tap(recipes => {
+        tap((recipes) => {
           console.log(recipes);
           this.rServ.setRecipes(recipes);
         })

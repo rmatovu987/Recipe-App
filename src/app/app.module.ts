@@ -5,12 +5,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app/app-routing.module';
 import { AuthComponent } from './auth/auth.component';
+import { CoreModule } from './core.module';
 import { HeaderComponent } from './header/header.component';
-import { RecipeService } from './recipes/recipe.service';
-import { RecipesModule } from './recipes/recipes.module';
 import { SharedModule } from './shared/shared.module';
-import { ShoppingListModule } from './shopping-list/shopping-list.module';
-import { ShoppingListService } from './shopping-list/shopping-list.service';
 
 
 
@@ -26,11 +23,9 @@ import { ShoppingListService } from './shopping-list/shopping-list.service';
     ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
-    RecipesModule,
-    ShoppingListModule,
-    SharedModule
+    SharedModule,
+    CoreModule
   ],
-  providers: [ShoppingListService, RecipeService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

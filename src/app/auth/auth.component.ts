@@ -1,10 +1,9 @@
-import { AuthResponseData } from './../auth.service';
-import { Observable } from 'rxjs';
-import { FormControl, Validators } from "@angular/forms";
 import { Component, OnInit } from "@angular/core";
-import { FormGroup } from "@angular/forms";
-import { AuthService } from "../auth.service";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from "../auth.service";
+import { AuthResponseData } from './../auth.service';
 
 @Component({
   selector: "app-auth",
@@ -64,5 +63,9 @@ export class AuthComponent implements OnInit {
     );
 
     this.form.reset();
+  }
+
+  onHandleError() {
+    this.error = null;
   }
 }

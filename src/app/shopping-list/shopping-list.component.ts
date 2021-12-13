@@ -1,35 +1,41 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-
-import { Ingredient } from '../shared/ingredient.model';
-import { ShoppingListService } from './shopping-list.service';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { Ingredient } from "../shared/ingredient.model";
+import * as fromApp from '../store/app.reducer';
+// import { ShoppingListService } from "./shopping-list.service";
+import * as ShoppingListActions from './store/shopping-list.action';
 
 @Component({
-  selector: 'app-shopping-list',
-  templateUrl: './shopping-list.component.html',
-  styleUrls: ['./shopping-list.component.css']
+  selector: "app-shopping-list",
+  templateUrl: "./shopping-list.component.html",
+  styleUrls: ["./shopping-list.component.css"],
 })
 export class ShoppingListComponent implements OnInit, OnDestroy {
-  ingredients: Ingredient[];
-  private sub: Subscription;
+  ingredients: Observable<{ ingredients: Ingredient[] }>;
+  // private sub: Subscription;
 
-  constructor(private slService: ShoppingListService) { }
-  
+  constructor(
+    private store: Store<fromApp.AppState>
+  ) {}
+
   ngOnInit() {
-    this.ingredients = this.slService.getIngredients();
-    this.sub = this.slService.ingredientsChanged
-      .subscribe(
-        (ingredients: Ingredient[]) => {
-          this.ingredients = ingredients;
-        }
-      );
+    this.ingredients = this.store.select("shoppingList");
+
+    // this.ingredients = this.slService.getIngredients();
+    // this.sub = this.slService.ingredientsChanged.subscribe(
+    //   (ingredients: Ingredient[]) => {
+    //     this.ingredients = ingredients;
+    //   }
+    // );
   }
 
   onEditItem(index: number) {
-    this.slService.startedEditing.next(index);
+    // this.slService.startedEditing.next(index);
+    this.store.dispatch(new ShoppingListActions.StartEdit(index));
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    // this.sub.unsubscribe();
   }
 }

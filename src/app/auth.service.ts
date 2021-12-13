@@ -1,9 +1,12 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
-import { BehaviorSubject, throwError } from "rxjs";
+import { Store } from "@ngrx/store";
+import { throwError } from "rxjs";
 import { catchError, tap } from "rxjs/operators";
 import { environment } from "src/environments/environment";
+import * as fromApp from "../app/store/app.reducer";
+import * as AuthActions from "./auth/store/auth.action";
 import { User } from "./auth/user.model";
 
 export interface AuthResponseData {
@@ -20,15 +23,20 @@ export interface AuthResponseData {
   providedIn: "root",
 })
 export class AuthService {
-  user = new BehaviorSubject<User>(null);
+  // user = new BehaviorSubject<User>(null);
   private timer: any;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private store: Store<fromApp.AppState>
+  ) {}
 
   signUp(email: string, password: string) {
     return this.http
       .post<AuthResponseData>(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key="+environment.firebaseKey,
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" +
+          environment.firebaseKey,
         { email: email, password: password, returnSecureToken: true }
       )
       .pipe(
@@ -45,14 +53,15 @@ export class AuthService {
   }
 
   logout() {
-    this.user.next(null);
+    // this.user.next(null);
+    this.store.dispatch(new AuthActions.Logout());
     localStorage.removeItem("userData");
     if (this.timer) {
       clearTimeout(this.timer);
     }
     this.timer = null;
 
-    this.router.navigate(['/auth']);
+    this.router.navigate(["/auth"]);
   }
 
   autoLogout(expirationDuration: number) {
@@ -64,7 +73,8 @@ export class AuthService {
   login(email: string, password: string) {
     return this.http
       .post<AuthResponseData>(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key="+environment.firebaseKey,
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
+          environment.firebaseKey,
         { email: email, password: password, returnSecureToken: true }
       )
       .pipe(
@@ -100,8 +110,18 @@ export class AuthService {
     );
 
     if (loadedUser.token) {
-      this.user.next(loadedUser);
-      const duration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
+      // this.user.next(loadedUser);
+      this.store.dispatch(
+        new AuthActions.Login({
+          email: loadedUser.email,
+          userID: loadedUser.id,
+          token: loadedUser.token,
+          expirationDate: new Date(userData._tokenExpirationDate),
+        })
+      );
+      const duration =
+        new Date(userData._tokenExpirationDate).getTime() -
+        new Date().getTime();
       this.autoLogout(duration);
     }
   }
@@ -114,12 +134,14 @@ export class AuthService {
   ) {
     const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
     const user = new User(email, userId, token, expirationDate);
-    this.user.next(user);
-    this.autoLogout(expiresIn*1000)
+    // this.user.next(user);
+    this.store.dispatch(new AuthActions.Login({email: email, userID: userId, token: token, expirationDate: expirationDate}));
+    this.autoLogout(expiresIn * 1000);
     localStorage.setItem("userData", JSON.stringify(user));
   }
 
   private handleError(errorRes: HttpErrorResponse) {
+    console.log(errorRes);
     let errorMessage = "An unknown error occurred!";
     if (!errorRes.error || !errorRes.error.error) {
       return throwError(errorMessage);

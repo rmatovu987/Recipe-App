@@ -1,37 +1,32 @@
-import { AuthService } from "./../auth.service";
 import {
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-  HTTP_INTERCEPTORS,
-} from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { exhaustMap, take } from "rxjs/operators";
+  HttpHandler, HttpInterceptor, HttpParams, HttpRequest
+} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { exhaustMap, map, take } from 'rxjs/operators';
+import { AuthService } from '../auth.service';
+import * as fromApp from '../store/app.reducer';
+
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
-  constructor(private authS: AuthService) {}
+  constructor(private authService: AuthService, private store: Store<fromApp.AppState>) {}
 
-  intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-    let authReq = req;
-
-    const token = sessionStorage.getItem('jwt_token');
-
-    if (token !== null) {
-      authReq = req.clone({
-        headers: req.headers.set('Authorization', 'Bearer ' + token),
-      });
-    }
-
-    return next.handle(authReq);
+  intercept(req: HttpRequest<any>, next: HttpHandler) {
+    return this.store.select('auth').pipe(
+      take(1),
+      map(authState => {
+        return authState.user;
+      }),
+      exhaustMap(user => {
+        if (!user) {
+          return next.handle(req);
+        }
+        const modifiedReq = req.clone({
+          params: new HttpParams().set('auth', user.token)
+        });
+        return next.handle(modifiedReq);
+      })
+    );
   }
 }
-
-export const jwtInterceptorProviders = [
-  { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true },
-];

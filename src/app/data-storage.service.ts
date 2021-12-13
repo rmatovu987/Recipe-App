@@ -19,7 +19,7 @@ export class DataStorageService {
     const recipes = this.rServ.getRecipes();
     this.http
       .post(
-        "https://anguka-53223-default-rtdb.firebaseio.com/recipes.json",
+        "https://udemy-7360d-default-rtdb.firebaseio.com/recipes.json",
         recipes
       )
       .subscribe((resp) => {
@@ -30,18 +30,27 @@ export class DataStorageService {
   fetchRecipes() {
     return this.http
       .get<Recipe[]>(
-        "https://anguka-53223-default-rtdb.firebaseio.com/recipes.json"
+        "https://udemy-7360d-default-rtdb.firebaseio.com/recipes.json"
       )
       .pipe(
-        map((recipes) => {
-          console.log(recipes);
-          return recipes.map((recipe) => {
+        map(recipes => {
+          return recipes.map(recipe => {
             return {
               ...recipe,
-              ingredients: recipe.ingredients ? recipe.ingredients : [],
+              ingredients: recipe.ingredients ? recipe.ingredients : []
             };
           });
         }),
+
+        // map((recipes) => {
+        //   console.log(recipes);
+        //   return recipes.map((recipe) => {
+        //     return {
+        //       ...recipe,
+        //       ingredients: recipe.ingredients ? recipe.ingredients : [],
+        //     };
+        //   });
+        // }),
         tap((recipes) => {
           console.log(recipes);
           this.rServ.setRecipes(recipes);
